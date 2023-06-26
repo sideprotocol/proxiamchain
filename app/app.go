@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 
@@ -97,7 +96,6 @@ import (
 	ibcporttypes "github.com/cosmos/ibc-go/v6/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v6/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v6/modules/core/keeper"
-	"github.com/gorilla/mux"
 	"github.com/spf13/cast"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -306,11 +304,10 @@ func New(
 		paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey, evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey, icahosttypes.StoreKey, capabilitytypes.StoreKey, group.StoreKey,
 		icacontrollertypes.StoreKey,
-
+		// this line is used by starport scaffolding # stargate/app/storeKey
 		//ibcswap
 		ibcatomicswaptypes.StoreKey,
 		ibcinterchainswaptypes.StoreKey,
-		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -481,9 +478,6 @@ func New(
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
 
-	atomicStack := ibcatomicswap.NewIBCModule(app.AtomicSwapKeeper)
-	interchainStack := ibcinterchainswap.NewIBCModule(app.InterchainSwapKeeper)
-
 	app.ICAHostKeeper = icahostkeeper.NewKeeper(
 		appCodec, keys[icahosttypes.StoreKey],
 		app.GetSubspace(icahosttypes.SubModuleName),
@@ -520,7 +514,9 @@ func New(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
+		AddRoute(ibcinterchainswaptypes.RouterKey, ibcinterchainswap.NewMarketFeeUpdateProposalHandler(app.InterchainSwapKeeper))
+
 	govConfig := govtypes.DefaultConfig()
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec,
@@ -537,6 +533,11 @@ func New(
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	/**** IBC Routing ****/
+
+	//transferStack := transfer.NewIBCModule(app.TransferKeeper)
+
+	atomicStack := ibcatomicswap.NewIBCModule(app.AtomicSwapKeeper)
+	interchainStack := ibcinterchainswap.NewIBCModule(app.InterchainSwapKeeper)
 
 	// Sealing prevents other modules from creating scoped sub-keepers
 	app.CapabilityKeeper.Seal()
@@ -748,7 +749,9 @@ func New(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
-		// this line is used by starport scaffolding # stargate/app/appModule
+		// this line is used by starport scaffolding # stargate/app/appModule,
+		ibcatomicswap.NewAppModule(app.AtomicSwapKeeper),
+		ibcinterchainswap.NewAppModule(app.InterchainSwapKeeper),
 	)
 	app.sm.RegisterStoreDecoders()
 
@@ -907,11 +910,6 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 
 	// register app's OpenAPI routes.
 	docs.RegisterOpenAPIService(Name, apiSvr.Router)
-}
-
-func RegisterSwaggerAPI(_ client.Context, rtr *mux.Router) {
-	// Register Swagger UI
-	rtr.PathPrefix("/swagger/").Handler(http.StripPrefix("/swagger", http.FileServer(http.Dir("./client/docs/swagger-ui/"))))
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
