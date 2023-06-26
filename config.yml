@@ -1,21 +1,68 @@
 version: 1
+build:
+  binary: bobchaind
+  proto:
+    path: proto
+    third_party_paths:
+      - third_party/proto
+      - proto_vendor
 accounts:
-- name: alice
-  coins:
-  - 20000token
-  - 200000000stake
-- name: bob
-  coins:
-  - 10000token
-  - 100000000stake
-client:
-  openapi:
-    path: docs/static/openapi.yml
+  - name: alice
+    coins:
+      - 100000000000000000000000abob
+      - 100000000000000000000000bobusdt
+      - 100000000000000000000000bobusdc
+      - 100000000000000000000000bobeth
+  - name: bob
+    mnemonic: actress letter whip youth flip sort announce chief traffic side destroy seek parade warrior awake scan panther nominee harsh spawn differ enroll glue become
+    coins:
+      - 10000000000000000000000abob
+      - 100000000000000000000000bobusdt
+      - 100000000000000000000000bobusdc
+      - 100000000000000000000000bobeth
+  - name: david
+    mnemonic: model talent wild salmon planet sure hill extra select curve royal super split swing liberty february country sibling label donkey pink butter picnic body
+    coins:
+      - 1000000000000000000abob
+      - 100000000000000000000000bobusdt
+      - 100000000000000000000000bobusdc
+      - 100000000000000000000000bobeth
 faucet:
   name: bob
   coins:
-  - 5token
-  - 100000stake
+    - 10abob
+  host: 0.0.0.0:4500
+genesis:
+  app_state:
+    crisis:
+      constant_fee:
+        denom: abob
+    evm:
+      params:
+        evm_denom: abob
+    gov:
+      deposit_params:
+        min_deposit:
+          - amount: "10000000"
+            denom: abob
+    mint:
+      params:
+        mint_denom: abob
+    staking:
+      params:
+        bond_denom: abob
+  chain_id: alice_1819-1
+  consensus_params:
+    block:
+      max_gas: "100000000"
 validators:
-- name: alice
-  bonded: 100000000stake
+  - name: alice
+    bonded: 10000000000000000000000abob
+    app:
+      evm-rpc:
+        address: 0.0.0.0:8545
+        ws-address: 0.0.0.0:8546
+    home: $HOME/.bobchaind
+client:
+  openapi:
+    path: "docs/static/openapi.yml"

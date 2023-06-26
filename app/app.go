@@ -107,10 +107,22 @@ import (
 
 	appparams "bobchain/app/params"
 	"bobchain/docs"
+
+	ibcfee "github.com/cosmos/ibc-go/v6/modules/apps/29-fee"
+	ibcfeekeeper "github.com/cosmos/ibc-go/v6/modules/apps/29-fee/keeper"
+	ibcfeetypes "github.com/cosmos/ibc-go/v6/modules/apps/29-fee/types"
+
+	ibcatomicswap "github.com/sideprotocol/ibcswap/v6/modules/apps/100-atomic-swap"
+	atomicswapkeeper "github.com/sideprotocol/ibcswap/v6/modules/apps/100-atomic-swap/keeper"
+	ibcatomicswaptypes "github.com/sideprotocol/ibcswap/v6/modules/apps/100-atomic-swap/types"
+
+	ibcinterchainswap "github.com/sideprotocol/ibcswap/v6/modules/apps/101-interchain-swap"
+	interchainswapkeeper "github.com/sideprotocol/ibcswap/v6/modules/apps/101-interchain-swap/keeper"
+	ibcinterchainswaptypes "github.com/sideprotocol/ibcswap/v6/modules/apps/101-interchain-swap/types"
 )
 
 const (
-	AccountAddressPrefix = "cosmos"
+	AccountAddressPrefix = "bob"
 	Name                 = "bobchain"
 )
 
@@ -162,6 +174,9 @@ var (
 		ica.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		ibcfee.AppModuleBasic{},
+		ibcatomicswap.AppModuleBasic{},
+		ibcinterchainswap.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -174,7 +189,10 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		ibcfeetypes.ModuleName:         nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
+		ibcatomicswaptypes.ModuleName:     nil,
+		ibcinterchainswaptypes.ModuleName: {authtypes.Minter, authtypes.Burner},
 	}
 )
 
@@ -223,16 +241,24 @@ type App struct {
 	UpgradeKeeper    upgradekeeper.Keeper
 	ParamsKeeper     paramskeeper.Keeper
 	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	IBCFeeKeeper     ibcfeekeeper.Keeper
 	EvidenceKeeper   evidencekeeper.Keeper
 	TransferKeeper   ibctransferkeeper.Keeper
 	ICAHostKeeper    icahostkeeper.Keeper
 	FeeGrantKeeper   feegrantkeeper.Keeper
 	GroupKeeper      groupkeeper.Keeper
 
+	AtomicSwapKeeper     atomicswapkeeper.Keeper
+	InterchainSwapKeeper interchainswapkeeper.Keeper
+
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
+
+	// atomic swap
+	ScopedAtomicSwapKeeper     capabilitykeeper.ScopedKeeper
+	ScopedInterchainSwapKeeper capabilitykeeper.ScopedKeeper
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
@@ -278,6 +304,10 @@ func New(
 		paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey, evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey, icahosttypes.StoreKey, capabilitytypes.StoreKey, group.StoreKey,
 		icacontrollertypes.StoreKey,
+
+		//ibcswap
+		ibcatomicswaptypes.StoreKey,
+		ibcinterchainswaptypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -317,6 +347,8 @@ func New(
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
 	// this line is used by starport scaffolding # stargate/app/scopedKeeper
+	scopedAtomicSwapKeeper := app.CapabilityKeeper.ScopeToModule(ibcatomicswaptypes.ModuleName)
+	scopedInterchainSwapKeeper := app.CapabilityKeeper.ScopeToModule(ibcinterchainswaptypes.ModuleName)
 
 	// add keepers
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
@@ -424,6 +456,14 @@ func New(
 		scopedIBCKeeper,
 	)
 
+	// IBC Fee Module keeper
+	app.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
+		appCodec, keys[ibcfeetypes.StoreKey],
+		app.IBCKeeper.ChannelKeeper, // may be replaced with IBC middleware
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper, app.AccountKeeper, app.BankKeeper,
+	)
+
 	// Create Transfer Keepers
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec,
@@ -523,6 +563,31 @@ func New(
 
 	/**** Module Options ****/
 
+	app.AtomicSwapKeeper = atomicswapkeeper.NewKeeper(
+		appCodec,
+		keys[ibcatomicswaptypes.StoreKey],
+		app.GetSubspace(ibcatomicswaptypes.ModuleName),
+		app.IBCFeeKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		scopedAtomicSwapKeeper,
+	)
+
+	app.InterchainSwapKeeper = *interchainswapkeeper.NewKeeper(
+		appCodec,
+		keys[ibcinterchainswaptypes.StoreKey],
+		app.GetSubspace(ibcinterchainswaptypes.ModuleName),
+		app.IBCFeeKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.BankKeeper,
+		app.AccountKeeper,
+		scopedInterchainSwapKeeper,
+		app.MsgServiceRouter(),
+	)
+
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
 	// we prefer to be more strict in what arguments the modules expect.
 	skipGenesisInvariants := cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
@@ -555,6 +620,9 @@ func New(
 		transferModule,
 		icaModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
+		// Swap modules
+		ibcatomicswap.NewAppModule(app.AtomicSwapKeeper),
+		ibcinterchainswap.NewAppModule(app.InterchainSwapKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -584,6 +652,8 @@ func New(
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
+		ibcatomicswaptypes.ModuleName,
+		ibcinterchainswaptypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -608,6 +678,8 @@ func New(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
+		ibcatomicswaptypes.ModuleName,
+		ibcinterchainswaptypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -637,6 +709,8 @@ func New(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
+		ibcatomicswaptypes.ModuleName,
+		ibcinterchainswaptypes.ModuleName,
 	)
 
 	// Uncomment if you want to set a custom migration order here.
@@ -705,6 +779,8 @@ func New(
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
+	app.ScopedAtomicSwapKeeper = scopedAtomicSwapKeeper
+	app.ScopedInterchainSwapKeeper = scopedInterchainSwapKeeper
 
 	return app
 }
@@ -870,7 +946,9 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
-
+	// ibcswap subspaces
+	paramsKeeper.Subspace(ibcatomicswaptypes.ModuleName)
+	paramsKeeper.Subspace(ibcinterchainswaptypes.ModuleName)
 	return paramsKeeper
 }
 
