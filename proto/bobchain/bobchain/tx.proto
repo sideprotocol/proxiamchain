@@ -1,7 +1,0 @@
-syntax = "proto3";
-package bobchain.bobchain;
-
-option go_package = "bobchain/x/bobchain/types";
-
-// Msg defines the Msg service.
-service Msg {}

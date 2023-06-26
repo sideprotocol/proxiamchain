@@ -481,6 +481,9 @@ func New(
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
 
+	atomicStack := ibcatomicswap.NewIBCModule(app.AtomicSwapKeeper)
+	interchainStack := ibcinterchainswap.NewIBCModule(app.InterchainSwapKeeper)
+
 	app.ICAHostKeeper = icahostkeeper.NewKeeper(
 		appCodec, keys[icahosttypes.StoreKey],
 		app.GetSubspace(icahosttypes.SubModuleName),
@@ -542,7 +545,11 @@ func New(
 	ibcRouter := ibcporttypes.NewRouter()
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
-	// this line is used by starport scaffolding # ibc/app/router
+		// this line is used by starport scaffolding # ibc/app/router
+	// Add ibcswap module
+	ibcRouter.AddRoute(ibcatomicswaptypes.ModuleName, atomicStack)
+	ibcRouter.AddRoute(ibcinterchainswaptypes.ModuleName, interchainStack)
+
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	/**** Module Hooks ****/
