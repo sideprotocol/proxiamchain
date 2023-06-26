@@ -508,6 +508,31 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
+	app.AtomicSwapKeeper = atomicswapkeeper.NewKeeper(
+		appCodec,
+		keys[ibcatomicswaptypes.StoreKey],
+		app.GetSubspace(ibcatomicswaptypes.ModuleName),
+		app.IBCFeeKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		scopedAtomicSwapKeeper,
+	)
+
+	app.InterchainSwapKeeper = *interchainswapkeeper.NewKeeper(
+		appCodec,
+		keys[ibcinterchainswaptypes.StoreKey],
+		app.GetSubspace(ibcinterchainswaptypes.ModuleName),
+		app.IBCFeeKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.BankKeeper,
+		app.AccountKeeper,
+		scopedInterchainSwapKeeper,
+		app.MsgServiceRouter(),
+	)
+
 	govRouter := govv1beta1.NewRouter()
 	govRouter.
 		AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
@@ -572,31 +597,6 @@ func New(
 	)
 
 	/**** Module Options ****/
-
-	app.AtomicSwapKeeper = atomicswapkeeper.NewKeeper(
-		appCodec,
-		keys[ibcatomicswaptypes.StoreKey],
-		app.GetSubspace(ibcatomicswaptypes.ModuleName),
-		app.IBCFeeKeeper,
-		app.IBCKeeper.ChannelKeeper,
-		&app.IBCKeeper.PortKeeper,
-		app.AccountKeeper,
-		app.BankKeeper,
-		scopedAtomicSwapKeeper,
-	)
-
-	app.InterchainSwapKeeper = *interchainswapkeeper.NewKeeper(
-		appCodec,
-		keys[ibcinterchainswaptypes.StoreKey],
-		app.GetSubspace(ibcinterchainswaptypes.ModuleName),
-		app.IBCFeeKeeper,
-		app.IBCKeeper.ChannelKeeper,
-		&app.IBCKeeper.PortKeeper,
-		app.BankKeeper,
-		app.AccountKeeper,
-		scopedInterchainSwapKeeper,
-		app.MsgServiceRouter(),
-	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
 	// we prefer to be more strict in what arguments the modules expect.
