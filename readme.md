@@ -51,3 +51,4 @@ curl https://get.ignite.com/username/bobchain@latest! | sudo bash
 - [Cosmos SDK docs](https://docs.cosmos.network)
 - [Developer Chat](https://discord.gg/ignite)
 # bobchain
+# bobchain
