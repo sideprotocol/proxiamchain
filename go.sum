@@ -848,8 +848,8 @@ github.com/segmentio/kafka-go v0.2.0/go.mod h1:X6itGqS9L4jDletMsxZ7Dz+JFWxM6JHfP
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
 github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible/go.mod h1:5b4v6he4MtMOwMlS0TUMTu2PcXUg8+E1lC7eC3UO/RA=
 github.com/shurcooL/sanitized_anchor_name v1.0.0/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=
-github.com/sideprotocol/ibcswap/v6 v6.0.0-20230625181010-de9b0ff4401a h1:T5TXysNrwlcWYfDzKqFYkcBbBcMO77xXPlq65TsYN5Y=
-github.com/sideprotocol/ibcswap/v6 v6.0.0-20230625181010-de9b0ff4401a/go.mod h1:L29NuHU/v+vVbWzcDYph/1cZDLuw+I0TzIh+YBvVo1c=
+github.com/sideprotocol/ibcswap/v6 v6.0.0-20230705112811-baad998131ce h1:DV+j9hkXBEK70hjBT/7JQ6sXsxdb+QgV6UgwTWqelkU=
+github.com/sideprotocol/ibcswap/v6 v6.0.0-20230705112811-baad998131ce/go.mod h1:L29NuHU/v+vVbWzcDYph/1cZDLuw+I0TzIh+YBvVo1c=
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
 github.com/sirupsen/logrus v1.4.2/go.mod h1:tLMulIdttU9McNUspp0xgXVQah82FyeX6MwdIuYE2rE=
 github.com/sirupsen/logrus v1.6.0/go.mod h1:7uNnSEd1DgxDLC74fIahvMZmmYsHGZGEOFrfsX/uA88=

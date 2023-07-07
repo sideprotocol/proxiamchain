@@ -9,55 +9,55 @@ build:
 accounts:
   - name: alice
     coins:
-      - 100000000000000000000000abob
-      - 100000000000000000000000bobusdt
-      - 100000000000000000000000bobusdc
-      - 100000000000000000000000bobeth
+      - 100000000000000000000000ubob
+      - 100000000000000000000000uatom
+      - 100000000000000000000000uosmo
+      - 100000000000000000000000ubtc
   - name: bob
     mnemonic: actress letter whip youth flip sort announce chief traffic side destroy seek parade warrior awake scan panther nominee harsh spawn differ enroll glue become
     coins:
-      - 10000000000000000000000abob
-      - 100000000000000000000000bobusdt
-      - 100000000000000000000000bobusdc
-      - 100000000000000000000000bobeth
+      - 100000000000000000000000ubob
+      - 100000000000000000000000uatom
+      - 100000000000000000000000uosmo
+      - 100000000000000000000000ubtc
   - name: david
     mnemonic: model talent wild salmon planet sure hill extra select curve royal super split swing liberty february country sibling label donkey pink butter picnic body
     coins:
-      - 1000000000000000000abob
-      - 100000000000000000000000bobusdt
-      - 100000000000000000000000bobusdc
-      - 100000000000000000000000bobeth
+      - 100000000000000000000000ubob
+      - 100000000000000000000000uatom
+      - 100000000000000000000000uosmo
+      - 100000000000000000000000ubtc
 faucet:
   name: bob
   coins:
-    - 10abob
+    - 10ubob
   host: 0.0.0.0:4500
 genesis:
   app_state:
     crisis:
       constant_fee:
-        denom: abob
+        denom: ubob
     evm:
       params:
-        evm_denom: abob
+        evm_denom: ubob
     gov:
       deposit_params:
         min_deposit:
           - amount: "10000000"
-            denom: abob
+            denom: ubob
     mint:
       params:
-        mint_denom: abob
+        mint_denom: ubob
     staking:
       params:
-        bond_denom: abob
+        bond_denom: ubob
   chain_id: bob_1819-1
   consensus_params:
     block:
       max_gas: "100000000"
 validators:
   - name: alice
-    bonded: 10000000000000000000000abob
+    bonded: 10000000000000000000000ubob
     app:
       evm-rpc:
         address: 0.0.0.0:8545

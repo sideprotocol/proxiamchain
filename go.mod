@@ -10,7 +10,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0
 	github.com/regen-network/cosmos-proto v0.3.1
-	github.com/sideprotocol/ibcswap/v6 v6.0.0-20230625181010-de9b0ff4401a
+	github.com/sideprotocol/ibcswap/v6 v6.0.0-20230705112811-baad998131ce
 	github.com/spf13/cast v1.5.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
