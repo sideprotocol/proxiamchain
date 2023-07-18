@@ -1,6 +1,6 @@
 version: 1
 build:
-  binary: bobchaind
+  binary: kentchaind
   proto:
     path: proto
     third_party_paths:
@@ -9,60 +9,54 @@ build:
 accounts:
   - name: alice
     coins:
-      - 100000000000000000000000ubob
+      - 100000000000000000000000ukent
       - 100000000000000000000000uatom
-      - 100000000000000000000000uosmo
-      - 100000000000000000000000ubtc
   - name: bob
     mnemonic: actress letter whip youth flip sort announce chief traffic side destroy seek parade warrior awake scan panther nominee harsh spawn differ enroll glue become
     coins:
-      - 100000000000000000000000ubob
+      - 100000000000000000000000ukent
       - 100000000000000000000000uatom
-      - 100000000000000000000000uosmo
-      - 100000000000000000000000ubtc
   - name: david
     mnemonic: model talent wild salmon planet sure hill extra select curve royal super split swing liberty february country sibling label donkey pink butter picnic body
     coins:
-      - 100000000000000000000000ubob
+      - 100000000000000000000000ukent
       - 100000000000000000000000uatom
-      - 100000000000000000000000uosmo
-      - 100000000000000000000000ubtc
 faucet:
-  name: bob
+  name: david
   coins:
-    - 10ubob
+    - 10ukent
   host: 0.0.0.0:4500
 genesis:
   app_state:
     crisis:
       constant_fee:
-        denom: ubob
+        denom: ukent
     evm:
       params:
-        evm_denom: ubob
+        evm_denom: ukent
     gov:
       deposit_params:
         min_deposit:
           - amount: "10000000"
-            denom: ubob
+            denom: ukent
     mint:
       params:
-        mint_denom: ubob
+        mint_denom: ukent
     staking:
       params:
-        bond_denom: ubob
-  chain_id: bob_1819-1
+        bond_denom: ukent
+  chain_id: kent_1819-1
   consensus_params:
     block:
       max_gas: "100000000"
 validators:
   - name: alice
-    bonded: 10000000000000000000000ubob
+    bonded: 10000000000000000000000ukent
     app:
       evm-rpc:
         address: 0.0.0.0:8545
         ws-address: 0.0.0.0:8546
-    home: $HOME/.bobchaind
+    home: $HOME/.kentchaind
 client:
   openapi:
     path: "docs/static/openapi.yml"

@@ -105,8 +105,8 @@ import (
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
-	appparams "bobchain/app/params"
-	"bobchain/docs"
+	appparams "kentchain/app/params"
+	"kentchain/docs"
 
 	ibcfee "github.com/cosmos/ibc-go/v6/modules/apps/29-fee"
 	ibcfeekeeper "github.com/cosmos/ibc-go/v6/modules/apps/29-fee/keeper"

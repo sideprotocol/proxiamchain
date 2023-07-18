@@ -6,8 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 
-	"bobchain/app"
-	"bobchain/cmd/bobchaind/cmd"
+	"kentchain/app"
+	"kentchain/cmd/kentchaind/cmd"
 )
 
 func main() {
