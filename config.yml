@@ -12,15 +12,19 @@ accounts:
       - 100000000000000000000000ukent
       - 100000000000000000000000uatom
   - name: bob
-    mnemonic: actress letter whip youth flip sort announce chief traffic side destroy seek parade warrior awake scan panther nominee harsh spawn differ enroll glue become
     coins:
       - 100000000000000000000000ukent
       - 100000000000000000000000uatom
   - name: david
-    mnemonic: model talent wild salmon planet sure hill extra select curve royal super split swing liberty february country sibling label donkey pink butter picnic body
     coins:
       - 100000000000000000000000ukent
       - 100000000000000000000000uatom
+  - name: facuet
+    address: kent1yf0eejsuhjc5s3n7xzr0e8fzss6lgpdqsqsenr
+    coins:
+      - 10000000000000000000000000000ukent
+      - 10000000000000000000000000000uatom
+      
 faucet:
   name: david
   coins:
