@@ -1,6 +1,6 @@
 version: 1
 build:
-  binary: kentchaind
+  binary: proximachaind
   proto:
     path: proto
     third_party_paths:
@@ -9,15 +9,15 @@ build:
 accounts:
   - name: alice
     coins:
-      - 100000000000000000000000ukent
+      - 100000000000000000000000uprox
       - 100000000000000000000000uatom
   - name: bob
     coins:
-      - 100000000000000000000000ukent
+      - 100000000000000000000000uprox
       - 100000000000000000000000uatom
   - name: david
     coins:
-      - 100000000000000000000000ukent
+      - 100000000000000000000000uprox
       - 100000000000000000000000uatom
   - name: facuet
     address: kent1yf0eejsuhjc5s3n7xzr0e8fzss6lgpdqsqsenr
@@ -28,39 +28,39 @@ accounts:
 faucet:
   name: david
   coins:
-    - 10ukent
+    - 10uprox
   host: 0.0.0.0:4500
 genesis:
   app_state:
     crisis:
       constant_fee:
-        denom: ukent
+        denom: uprox
     evm:
       params:
-        evm_denom: ukent
+        evm_denom: uprox
     gov:
       deposit_params:
         min_deposit:
           - amount: "10000000"
-            denom: ukent
+            denom: uprox
     mint:
       params:
-        mint_denom: ukent
+        mint_denom: uprox
     staking:
       params:
-        bond_denom: ukent
-  chain_id: kent_1819-1
+        bond_denom: uprox
+  chain_id: proxima_1819-1
   consensus_params:
     block:
       max_gas: "100000000"
 validators:
   - name: alice
-    bonded: 10000000000000000000000ukent
+    bonded: 10000000000000000000000uprox
     app:
       evm-rpc:
         address: 0.0.0.0:8545
         ws-address: 0.0.0.0:8546
-    home: $HOME/.kentchaind
+    home: $HOME/.proximachaind
 client:
   openapi:
     path: "docs/static/openapi.yml"
